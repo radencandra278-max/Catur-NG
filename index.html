@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>三 0 · Catur Online + LED + Partikel</title>
+    <title>三 0 · Catur Online + Identitas + LED + Partikel</title>
     <!-- chessboard.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <!-- PeerJS for WebRTC -->
@@ -22,11 +22,11 @@
             align-items: center;
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             margin: 0;
-            padding: 16px;
+            padding: 8px;
             position: relative;
             overflow-x: hidden;
         }
-        /* Canvas partikel di latar belakang */
+        /* Canvas partikel di latar belakang - lebih ringan */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -35,16 +35,15 @@
             height: 100%;
             pointer-events: none;
             z-index: 0;
+            will-change: transform; /* hint untuk akselerasi */
         }
-        /* Container utama dengan efek transparan / glassmorphism */
+        /* Container utama tanpa blur */
         .game-container {
-            background: rgba(48, 64, 82, 0.65);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 28px 24px 32px 24px;
-            border-radius: 42px;
-            box-shadow: 0 25px 35px -8px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(30, 40, 50, 0.85); /* tanpa backdrop-filter */
+            padding: 20px 18px 24px 18px;
+            border-radius: 36px;
+            box-shadow: 0 15px 25px -5px rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.15);
             max-width: 800px;
             width: fit-content;
             position: relative;
@@ -55,110 +54,150 @@
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 22px;
-            padding: 0 8px;
+            margin-bottom: 18px;
+            padding: 0 5px;
             color: #f0ead2;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            gap: 15px;
+            text-shadow: 0 1px 3px black;
+            gap: 10px;
         }
-        .left-symbol {
-            font-size: 2.2rem;
-            font-weight: 400;
-            letter-spacing: 4px;
-            background: rgba(38, 50, 63, 0.8);
-            padding: 8px 22px;
-            border-radius: 60px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 5px 0 rgba(27,37,48,0.5);
-            border-bottom: 2px solid rgba(127,155,181,0.6);
-            line-height: 1;
-            color: #f2e9d0;
-            backdrop-filter: blur(4px);
-        }
+        /* left-symbol dihapus */
         .score-box {
-            background: rgba(49, 67, 81, 0.8);
-            padding: 8px 25px;
-            border-radius: 48px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 6px 0 rgba(29,42,51,0.5);
-            border-bottom: 2px solid rgba(136,160,184,0.6);
-            font-size: 1.5rem;
+            background: rgba(35, 45, 55, 0.95);
+            padding: 6px 18px;
+            border-radius: 40px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 4px 0 rgba(20,30,40,0.8);
+            border-bottom: 2px solid rgba(100,130,150,0.5);
+            font-size: 1.3rem;
             font-weight: 600;
             color: #f9e7b3;
             display: flex;
-            gap: 30px;
-            backdrop-filter: blur(4px);
+            gap: 20px;
         }
         .score-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .score-badge {
-            background: rgba(29, 43, 54, 0.9);
-            border-radius: 40px;
-            padding: 2px 14px;
-            font-size: 1.4rem;
+            background: rgba(20, 30, 40, 0.95);
+            border-radius: 30px;
+            padding: 2px 12px;
+            font-size: 1.2rem;
             color: #ecd79b;
-            border: 1px solid rgba(165,193,217,0.5);
+            border: 1px solid rgba(140,170,190,0.5);
         }
         .turn-indicators {
             display: flex;
-            gap: 20px;
-            background: rgba(49, 67, 81, 0.8);
-            padding: 10px 24px;
-            border-radius: 48px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 6px 0 rgba(29,42,51,0.5);
-            border-bottom: 2px solid rgba(136,160,184,0.6);
-            backdrop-filter: blur(4px);
+            gap: 12px;
+            background: rgba(35, 45, 55, 0.95);
+            padding: 6px 16px;
+            border-radius: 40px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 4px 0 rgba(20,30,40,0.8);
+            border-bottom: 2px solid rgba(100,130,150,0.5);
         }
         .turn-indicator {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 500;
-            padding: 6px 18px;
-            border-radius: 40px;
-            background: rgba(64, 89, 107, 0.9);
+            padding: 4px 12px;
+            border-radius: 30px;
+            background: rgba(50, 65, 80, 0.95);
             color: #b6cdde;
-            transition: all 0.15s;
-            box-shadow: 0 2px 0 rgba(37,50,62,0.5);
+            box-shadow: 0 2px 0 rgba(30,40,50,0.5);
             cursor: default;
-            border: 1px solid rgba(119,149,173,0.5);
+            border: 1px solid rgba(100,130,150,0.4);
         }
         .turn-indicator.active {
             background: #ecd79b;
             color: #1d2f3f;
             font-weight: 600;
-            box-shadow: 0 4px 0 #a08441, 0 0 12px #ffde9e;
+            box-shadow: 0 3px 0 #a08441;
             border-color: #fde5b1;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
+        }
+        /* Hamburger */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: rgba(40, 50, 60, 0.95);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 5px 4px;
+            cursor: pointer;
+            transition: 0.1s;
+            margin-left: 5px;
+        }
+        .hamburger:hover {
+            background: rgba(60, 75, 90, 0.95);
+        }
+        .hamburger-line {
+            width: 100%;
+            height: 3px;
+            background: #f0ead2;
+            border-radius: 3px;
+        }
+        .hamburger-dropdown {
+            position: absolute;
+            top: 80px;
+            right: 25px;
+            background: rgba(30, 40, 50, 0.98);
+            border-radius: 14px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+            z-index: 200;
+            min-width: 140px;
+        }
+        .hamburger-dropdown.show {
+            display: flex;
+        }
+        .hamburger-dropdown button {
+            background: #2e4e5e;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 2px solid #1a2f3a;
+            font-size: 0.95rem;
+        }
+        .hamburger-dropdown button:active {
+            transform: translateY(2px);
+            border-bottom-width: 1px;
         }
         .mode-selector {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin: 15px 0 10px;
+            gap: 10px;
+            margin: 12px 0 8px;
             flex-wrap: wrap;
         }
         .mode-btn {
-            background: rgba(44, 63, 78, 0.8);
+            background: rgba(40, 55, 70, 0.95);
             border: none;
-            border-bottom: 4px solid rgba(23,35,43,0.8);
+            border-bottom: 3px solid rgba(20,30,40,0.9);
             color: #dbd1b2;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            padding: 10px 30px;
-            border-radius: 40px;
+            padding: 8px 20px;
+            border-radius: 36px;
             cursor: pointer;
-            box-shadow: 0 5px 0 rgba(14,26,34,0.5), 0 5px 12px black;
-            transition: 0.06s linear;
-            border: 1px solid rgba(98,130,150,0.6);
+            box-shadow: 0 4px 0 rgba(10,20,30,0.7);
+            transition: 0.05s linear;
+            border: 1px solid rgba(80,110,130,0.5);
             flex: 0 1 auto;
-            backdrop-filter: blur(4px);
         }
         .mode-btn.active {
             background: #ecd79b;
             color: #1f333f;
             border-bottom-color: #a58542;
             transform: translateY(2px);
-            box-shadow: 0 2px 0 #0e1a22, 0 8px 12px black;
+            box-shadow: 0 2px 0 #0e1a22;
         }
 
         /* Panel online */
@@ -166,29 +205,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            background: rgba(30, 40, 50, 0.6);
-            backdrop-filter: blur(4px);
-            border-radius: 60px;
-            padding: 15px 25px;
-            border: 1px solid rgba(255,255,255,0.2);
+            gap: 8px;
+            margin: 10px 0;
+            background: rgba(30, 40, 50, 0.95);
+            border-radius: 50px;
+            padding: 12px 18px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         .online-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: center;
         }
         .online-input {
-            background: rgba(20, 30, 40, 0.8);
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(15, 25, 35, 0.95);
+            border: 1px solid rgba(255,255,255,0.2);
             color: #fff;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-size: 1rem;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.95rem;
             outline: none;
-            min-width: 200px;
+            min-width: 150px;
         }
         .online-input::placeholder {
             color: #a0b0c0;
@@ -196,14 +235,13 @@
         .online-btn {
             background: #2e4e5e;
             border: none;
-            border-bottom: 3px solid #1a2f3a;
+            border-bottom: 2px solid #1a2f3a;
             color: white;
-            padding: 10px 25px;
-            border-radius: 40px;
+            padding: 8px 18px;
+            border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.05s linear;
-            box-shadow: 0 4px 0 #0e1a22;
+            box-shadow: 0 3px 0 #0e1a22;
         }
         .online-btn:active {
             transform: translateY(3px);
@@ -212,8 +250,8 @@
         }
         .online-status {
             color: #b0e0ff;
-            font-size: 1.1rem;
-            text-shadow: 0 2px 3px black;
+            font-size: 1rem;
+            text-shadow: 0 1px 2px black;
         }
 
         .board-wrapper {
@@ -221,28 +259,28 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 15px 0 25px 0;
-            filter: drop-shadow(0 18px 15px #141e26);
+            margin: 10px 0 15px 0;
+            filter: drop-shadow(0 10px 8px #101820);
         }
 
-        /* strip LED */
+        /* strip LED - animasi lebih sederhana (hanya opacity) */
         .led-strip {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 8px 12px;
-            margin: 10px 0;
-            padding: 0 10px;
+            gap: 5px 8px;
+            margin: 6px 0;
+            padding: 0 5px;
             pointer-events: none;
         }
 
         .led {
-            width: 18px;
-            height: 18px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background: #ffaa00;
-            box-shadow: 0 0 12px currentColor;
-            animation: blink 1.8s infinite ease-in-out;
+            box-shadow: 0 0 5px currentColor;
+            animation: fade 2s infinite ease-in-out;
             flex-shrink: 0;
         }
 
@@ -259,70 +297,61 @@
         .led:nth-child(11) { background: #ff4d88; animation-delay: 1.1s; }
         .led:nth-child(12) { background: #ffaa4d; animation-delay: 1.3s; }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.2; transform: scale(0.7); }
+        @keyframes fade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
-        /* Baris yang memuat papan dan avatar di kiri/kanan */
+        /* Baris yang memuat papan dan avatar */
         .board-row {
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin: 10px 0;
+            gap: 8px;
+            margin: 5px 0;
         }
 
-        /* area avatar kiri & kanan */
+        /* area avatar - tanpa blur */
         .online-players {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            background: rgba(30, 40, 50, 0.5);
-            backdrop-filter: blur(4px);
-            padding: 15px 10px;
-            border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            gap: 10px;
+            background: rgba(25, 35, 45, 0.9);
+            padding: 12px 6px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
         }
 
         .avatar {
             position: relative;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            background: rgba(220, 220, 240, 0.15);
-            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(180, 190, 210, 0.15);
+            border: 2px solid rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #fff;
-            text-shadow: 0 2px 3px black;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            backdrop-filter: blur(2px);
-            transition: 0.2s;
-        }
-        .avatar:hover {
-            transform: scale(1.05);
-            border-color: #a0c0ff;
-            background: rgba(255,255,255,0.2);
+            text-shadow: 0 1px 2px black;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.4);
         }
         .avatar span:first-child {
             z-index: 2;
         }
         .dot {
             position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 14px;
-            height: 14px;
+            bottom: 3px;
+            right: 3px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            background: #4caf50; /* hijau online */
+            background: #4caf50;
             border: 2px solid #1e2a36;
-            box-shadow: 0 0 8px #00ff80;
         }
         .dot.offline {
             background: #9e9e9e;
@@ -330,81 +359,88 @@
         }
 
         #board {
-            width: 480px;
-            height: 480px;
-            border-radius: 20px;
+            width: 440px;
+            height: 440px;
+            border-radius: 16px;
             overflow: hidden;
-            border: 4px solid rgba(90, 111, 130, 0.8);
-            box-shadow: inset 0 0 0 2px rgba(217,200,169,0.5), 0 10px 10px rgba(0,0,0,0.5);
+            border: 3px solid rgba(80, 100, 120, 0.9);
+            box-shadow: inset 0 0 0 1px rgba(200,180,150,0.3), 0 6px 8px rgba(0,0,0,0.5);
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .white-1e1d7 {
-            background-color: rgba(237, 238, 213, 0.9) !important;
+            background-color: rgba(230, 225, 200, 0.9) !important;
         }
         .black-3c85d {
-            background-color: rgba(97, 147, 145, 0.9) !important;
+            background-color: rgba(80, 120, 120, 0.9) !important;
         }
+
+        .square-55d63 {
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
         .footer {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 22px;
+            gap: 15px;
+            margin-top: 16px;
             flex-wrap: wrap;
         }
         .action-btn {
-            background: rgba(49, 77, 92, 0.85);
+            background: rgba(40, 60, 75, 0.95);
             border: none;
-            border-bottom: 5px solid rgba(30,47,59,0.8);
+            border-bottom: 4px solid rgba(25,40,50,0.9);
             color: #fcf3dd;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            padding: 12px 30px;
-            border-radius: 60px;
-            letter-spacing: 1px;
+            padding: 8px 22px;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 8px 0 rgba(21,34,43,0.5), 0 8px 18px black;
-            transition: 0.07s linear;
+            box-shadow: 0 5px 0 rgba(15,25,35,0.7);
+            transition: 0.05s linear;
             text-transform: uppercase;
-            border: 1px solid rgba(120,155,179,0.6);
-            backdrop-filter: blur(4px);
+            border: 1px solid rgba(100,130,150,0.5);
         }
         .action-btn:active {
-            transform: translateY(5px);
+            transform: translateY(4px);
             border-bottom-width: 2px;
-            box-shadow: 0 3px 0 #15222b, 0 8px 12px black;
+            box-shadow: 0 2px 0 #15222b;
         }
         .reset-score-btn {
-            background: rgba(79, 67, 67, 0.85);
-            border-bottom-color: rgba(49,42,42,0.8);
+            background: rgba(70, 60, 60, 0.95);
+            border-bottom-color: rgba(40,35,35,0.9);
         }
 
-        @media (max-width: 750px) {
+        @media (max-width: 700px) {
             .board-row {
                 flex-wrap: wrap;
             }
             .online-players {
                 flex-direction: row;
                 order: 2;
-                margin-top: 15px;
-            }
-            .left, .right {
-                order: 2;
+                margin-top: 10px;
             }
             #board {
                 order: 1;
+                width: 340px;
+                height: 340px;
             }
             .game-container {
-                max-width: 550px;
+                max-width: 500px;
+                padding: 15px;
             }
         }
-        @media (max-width: 550px) {
-            #board { width: 360px; height: 360px; }
-            .led { width: 14px; height: 14px; }
-            .turn-indicator { font-size: 0.9rem; padding: 4px 10px; }
-            .left-symbol { font-size: 1.6rem; padding: 4px 16px; }
-            .score-box { font-size: 1.2rem; padding: 5px 15px; gap: 15px; }
-            .mode-btn { font-size: 1rem; padding: 8px 18px; }
-            .avatar { width: 45px; height: 45px; font-size: 1rem; }
+        @media (max-width: 450px) {
+            #board { width: 300px; height: 300px; }
+            .led { width: 12px; height: 12px; }
+            .turn-indicator { font-size: 0.8rem; padding: 3px 8px; }
+            .score-box { font-size: 1rem; padding: 4px 12px; gap: 10px; }
+            .mode-btn { font-size: 0.9rem; padding: 6px 14px; }
+            .avatar { width: 40px; height: 40px; font-size: 0.9rem; }
             .dot { width: 10px; height: 10px; }
         }
     </style>
@@ -418,29 +454,39 @@
 
     <div class="game-container">
         <div class="header">
-            <div class="left-symbol">三 0</div>
             <div class="score-box">
                 <div class="score-item">⚪ <span id="scoreWhite" class="score-badge">0</span></div>
                 <div class="score-item">⚫ <span id="scoreBlack" class="score-badge">0</span></div>
             </div>
             <div class="turn-indicators">
-                <span id="white-turn" class="turn-indicator active">1. White's move</span>
-                <span id="black-turn" class="turn-indicator">2. Black's move</span>
+                <span id="white-turn" class="turn-indicator active">1. White</span>
+                <span id="black-turn" class="turn-indicator">2. Black</span>
+            </div>
+            <div class="hamburger" id="hamburgerBtn">
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
+                <div class="hamburger-line"></div>
             </div>
         </div>
 
+        <div class="hamburger-dropdown" id="hamburgerDropdown">
+            <button id="fixLagBtn">Fix Lag: Off</button>
+        </div>
+
         <div class="mode-selector">
-            <button id="mode2p" class="mode-btn">👥 2 Player</button>
-            <button id="modeBot" class="mode-btn">🤖 Vs Bot</button>
+            <button id="mode2p" class="mode-btn">👥 2P</button>
+            <button id="modeBot" class="mode-btn">🤖 Bot</button>
             <button id="modeOnline" class="mode-btn active">🌐 Online</button>
         </div>
 
-        <!-- Panel Online (muncul jika mode online aktif) -->
         <div id="onlinePanel" class="online-panel">
             <div class="online-row">
-                <input type="text" id="peerIdInput" class="online-input" placeholder="Masukkan ID lawan">
-                <button id="hostBtn" class="online-btn">🎮 Host Game</button>
-                <button id="joinBtn" class="online-btn">🔗 Join Game</button>
+                <input type="text" id="nameInput" class="online-input" placeholder="Nama kamu" value="Player">
+                <input type="text" id="peerIdInput" class="online-input" placeholder="ID lawan">
+            </div>
+            <div class="online-row">
+                <button id="hostBtn" class="online-btn">🎮 Host</button>
+                <button id="joinBtn" class="online-btn">🔗 Join</button>
             </div>
             <div class="online-row">
                 <span id="onlineStatus" class="online-status">Status: Offline</span>
@@ -457,19 +503,19 @@
 
             <div class="board-row">
                 <div class="online-players left">
-                    <div class="avatar"><span>P1</span><span class="dot"></span></div>
-                    <div class="avatar"><span>P2</span><span class="dot"></span></div>
-                    <div class="avatar"><span>P3</span><span class="dot offline"></span></div>
-                    <div class="avatar"><span>P4</span><span class="dot"></span></div>
+                    <div class="avatar" id="avatarLeft1"><span>P1</span><span class="dot"></span></div>
+                    <div class="avatar" id="avatarLeft2"><span>P2</span><span class="dot"></span></div>
+                    <div class="avatar" id="avatarLeft3"><span>P3</span><span class="dot offline"></span></div>
+                    <div class="avatar" id="avatarLeft4"><span>P4</span><span class="dot"></span></div>
                 </div>
 
                 <div id="board"></div>
 
                 <div class="online-players right">
-                    <div class="avatar"><span>P5</span><span class="dot"></span></div>
-                    <div class="avatar"><span>P6</span><span class="dot"></span></div>
-                    <div class="avatar"><span>P7</span><span class="dot offline"></span></div>
-                    <div class="avatar"><span>P8</span><span class="dot"></span></div>
+                    <div class="avatar" id="avatarRight1"><span>P5</span><span class="dot"></span></div>
+                    <div class="avatar" id="avatarRight2"><span>P6</span><span class="dot"></span></div>
+                    <div class="avatar" id="avatarRight3"><span>P7</span><span class="dot offline"></span></div>
+                    <div class="avatar" id="avatarRight4"><span>P8</span><span class="dot"></span></div>
                 </div>
             </div>
 
@@ -481,30 +527,33 @@
         </div>
 
         <div class="footer">
-            <button class="action-btn" id="newGameBtn">↺ New Game</button>
-            <button class="action-btn reset-score-btn" id="resetScoreBtn">⟲ Reset Score</button>
+            <button class="action-btn" id="newGameBtn">↺ New</button>
+            <button class="action-btn reset-score-btn" id="resetScoreBtn">⟲ Reset</button>
         </div>
     </div>
 
     <script>
-        // ==================== PARTIKEL ====================
-        (function() {
+        // ==================== PARTIKEL RINGAN ====================
+        const ParticleSystem = (function() {
             const canvas = document.getElementById('particle-canvas');
             const ctx = canvas.getContext('2d');
             let width, height;
             let particles = [];
+            let animationFrame = null;
+            let isRunning = false;
 
             function initParticles() {
-                const particleCount = 70;
+                particles = [];
+                const particleCount = 20; // turun dari 70
                 for (let i = 0; i < particleCount; i++) {
                     particles.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        vx: (Math.random() - 0.5) * 0.4,
-                        vy: (Math.random() - 0.5) * 0.2,
-                        radius: Math.random() * 3 + 1.5,
-                        color: `hsl(${Math.random() * 60 + 200}, 80%, 70%)`,
-                        alpha: Math.random() * 0.6 + 0.2,
+                        vx: (Math.random() - 0.5) * 0.3,
+                        vy: (Math.random() - 0.5) * 0.15,
+                        radius: Math.random() * 2 + 1,
+                        color: `hsl(${Math.random() * 60 + 200}, 70%, 65%)`,
+                        alpha: Math.random() * 0.5 + 0.2,
                         blinkSpeed: Math.random() * 0.02 + 0.01,
                         blinkPhase: Math.random() * Math.PI * 2
                     });
@@ -516,19 +565,18 @@
                 height = window.innerHeight;
                 canvas.width = width;
                 canvas.height = height;
+                if (isRunning) drawParticles();
             }
 
             function updateParticles() {
                 for (let p of particles) {
                     p.x += p.vx;
                     p.y += p.vy;
-
                     if (p.x < 0) p.x = width;
                     if (p.x > width) p.x = 0;
                     if (p.y < 0) p.y = height;
                     if (p.y > height) p.y = 0;
-
-                    p.alpha = 0.3 + 0.4 * Math.sin(Date.now() * p.blinkSpeed + p.blinkPhase);
+                    p.alpha = 0.3 + 0.3 * Math.sin(Date.now() * p.blinkSpeed + p.blinkPhase);
                 }
             }
 
@@ -540,322 +588,263 @@
                     ctx.fillStyle = p.color;
                     ctx.globalAlpha = p.alpha;
                     ctx.fill();
-                    ctx.shadowColor = p.color;
-                    ctx.shadowBlur = 10;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
                 }
                 ctx.globalAlpha = 1.0;
             }
 
             function animate() {
+                if (!isRunning) return;
                 updateParticles();
                 drawParticles();
-                requestAnimationFrame(animate);
+                animationFrame = requestAnimationFrame(animate);
             }
 
-            window.addEventListener('resize', () => {
-                resizeCanvas();
-            });
+            function start() {
+                if (isRunning) return;
+                isRunning = true;
+                if (!particles.length) initParticles();
+                animate();
+            }
 
+            function stop() {
+                isRunning = false;
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                    animationFrame = null;
+                }
+                ctx.clearRect(0, 0, width, height);
+            }
+
+            window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
             initParticles();
-            animate();
+            start();
+
+            return { start, stop };
         })();
 
-        // ==================== LOGIKA CATUR + ONLINE ====================
+        // ==================== LOGIKA CATUR ====================
         $(document).ready(function() {
             var game = new Chess();
             var pieceTheme = 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png';
-            var gameMode = 'online'; // default online
-            var scoreWhite = 0;
-            var scoreBlack = 0;
-            var $scoreWhite = $('#scoreWhite');
-            var $scoreBlack = $('#scoreBlack');
+            var gameMode = 'online';
+            var scoreWhite = 0, scoreBlack = 0;
+            var $scoreWhite = $('#scoreWhite'), $scoreBlack = $('#scoreBlack');
             var board;
 
-            // Variabel online
-            var peer = null;
-            var conn = null;
-            var myId = null;
-            var isHost = false; // host = putih, join = hitam
-            var onlineConnected = false;
-            var $onlineStatus = $('#onlineStatus');
-            var $myPeerId = $('#myPeerId');
+            var peer = null, conn = null, myId = null, isHost = false, onlineConnected = false;
+            var $onlineStatus = $('#onlineStatus'), $myPeerId = $('#myPeerId');
 
-            // Update UI mode
+            // Nama dan identitas
+            var myName = '';
+            var opponentName = '';
+
+            var audioCtx = null;
+            function playMoveSound() {
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume().then(() => createMoveSound(audioCtx));
+                    } else createMoveSound(audioCtx);
+                } catch (e) { console.warn("Audio error"); }
+            }
+            function createMoveSound(ctx) {
+                var osc = ctx.createOscillator();
+                var gainNode = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 600;
+                gainNode.gain.value = 0.8;
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.06);
+            }
+
+            // Fungsi update nama di avatar
+            function updateAvatar(hostName, joinName) {
+                if (hostName) {
+                    $('#avatarLeft1 span:first-child').text(hostName);
+                }
+                if (joinName) {
+                    $('#avatarRight1 span:first-child').text(joinName);
+                }
+            }
+
             function setMode(mode) {
                 gameMode = mode;
                 $('#mode2p, #modeBot, #modeOnline').removeClass('active');
                 if (mode === '2player') $('#mode2p').addClass('active');
                 else if (mode === 'vsbot') $('#modeBot').addClass('active');
                 else if (mode === 'online') $('#modeOnline').addClass('active');
-                // Tampilkan panel online hanya jika mode online
-                if (mode === 'online') {
-                    $('#onlinePanel').show();
-                } else {
+                if (mode === 'online') $('#onlinePanel').show();
+                else {
                     $('#onlinePanel').hide();
-                    // Putuskan koneksi jika ada
                     if (conn) conn.close();
                     if (peer) peer.destroy();
-                    peer = null;
-                    conn = null;
-                    onlineConnected = false;
+                    peer = null; conn = null; onlineConnected = false;
                     $onlineStatus.text('Status: Offline');
                     $myPeerId.text('');
+                    // reset avatar
+                    $('#avatarLeft1 span:first-child').text('P1');
+                    $('#avatarRight1 span:first-child').text('P5');
                 }
             }
 
-            // Update skor
-            function updateScoreUI() {
-                $scoreWhite.text(scoreWhite);
-                $scoreBlack.text(scoreBlack);
-            }
-
-            // Update indikator giliran
+            function updateScoreUI() { $scoreWhite.text(scoreWhite); $scoreBlack.text(scoreBlack); }
             function updateTurnIndicators() {
                 if (game.game_over()) {
                     if (game.in_checkmate()) {
                         var winnerColor = game.turn() === 'w' ? 'black' : 'white';
-                        var winnerName = winnerColor === 'white' ? 'Putih' : 'Hitam';
-                        if (winnerColor === 'white') scoreWhite++;
-                        else scoreBlack++;
+                        if (winnerColor === 'white') scoreWhite++; else scoreBlack++;
                         updateScoreUI();
-                        alert('🏆 ' + winnerName + ' menang! Skor diperbarui.');
-                        
-                        $('#white-turn, #black-turn').removeClass('active');
-                        $('#white-turn').text('1. ' + (winnerColor === 'white' ? 'White wins' : 'Checkmate'));
-                        $('#black-turn').text('2. ' + (winnerColor === 'black' ? 'Black wins' : 'Checkmate'));
-                    } else {
-                        $('#white-turn, #black-turn').removeClass('active');
-                        $('#white-turn').text('1. Game over');
-                        $('#black-turn').text('2. Draw');
-                        alert('🤝 Permainan berakhir seri.');
-                    }
+                        alert((winnerColor === 'white' ? 'Putih' : 'Hitam') + ' menang!');
+                    } else alert('Seri!');
                     return;
                 }
-
                 var turn = game.turn();
-                if (turn === 'w') {
-                    $('#white-turn').addClass('active').text('1. White\'s move');
-                    $('#black-turn').removeClass('active').text('2. Black\'s move');
-                } else {
-                    $('#white-turn').removeClass('active').text('1. White\'s move');
-                    $('#black-turn').addClass('active').text('2. Black\'s move');
-                }
+                $('#white-turn').toggleClass('active', turn === 'w');
+                $('#black-turn').toggleClass('active', turn === 'b');
             }
 
-            // Bot (random)
             function makeBotMove() {
-                if (gameMode !== 'vsbot') return;
-                if (game.game_over()) {
-                    updateTurnIndicators();
-                    return;
-                }
-                if (game.turn() !== 'b') return;
+                if (gameMode !== 'vsbot' || game.game_over() || game.turn() !== 'b') return;
                 var moves = game.moves();
-                if (moves.length === 0) return;
-                var randomIdx = Math.floor(Math.random() * moves.length);
-                game.move(moves[randomIdx]);
-                board.position(game.fen());
-                updateTurnIndicators();
-            }
-
-            // Kirim gerakan ke lawan (online)
-            function sendMove(move) {
-                if (conn && conn.open) {
-                    conn.send({
-                        type: 'move',
-                        from: move.from,
-                        to: move.to,
-                        promotion: move.promotion || 'q'
-                    });
-                }
-            }
-
-            // Proses gerakan dari lawan
-            function applyRemoteMove(moveData) {
-                var move = game.move({
-                    from: moveData.from,
-                    to: moveData.to,
-                    promotion: moveData.promotion
-                });
-                if (move) {
+                if (moves.length) {
+                    game.move(moves[Math.floor(Math.random() * moves.length)]);
                     board.position(game.fen());
+                    playMoveSound();
                     updateTurnIndicators();
-                } else {
-                    console.warn("Invalid remote move", moveData);
                 }
             }
 
-            // Konfigurasi board dengan pengecekan giliran online
+            function sendMove(move) {
+                if (conn && conn.open) conn.send({ type: 'move', from: move.from, to: move.to, promotion: 'q' });
+            }
+            function applyRemoteMove(moveData) {
+                var move = game.move({ from: moveData.from, to: moveData.to, promotion: moveData.promotion });
+                if (move) { board.position(game.fen()); playMoveSound(); updateTurnIndicators(); }
+            }
+
             var boardConfig = {
                 draggable: true,
                 position: 'start',
                 pieceTheme: pieceTheme,
-                onDragStart: function(source, piece, position, orientation) {
+                onDragStart: function(source, piece, pos, orient) {
                     if (game.game_over()) return false;
-
-                    // Mode online: hanya bisa jika terhubung dan giliran sesuai
                     if (gameMode === 'online') {
-                        if (!onlineConnected) {
-                            alert('Belum terhubung ke lawan');
-                            return false;
-                        }
-                        var currentTurn = game.turn();
-                        if (isHost && currentTurn === 'w') return true;  // host putih
-                        if (!isHost && currentTurn === 'b') return true; // join hitam
-                        return false; // bukan giliran
-                    }
-                    // Mode vs bot
-                    else if (gameMode === 'vsbot') {
-                        if (game.turn() !== 'w') return false;
-                        if (piece.search(/^b/) !== -1) return false;
-                        return true;
-                    }
-                    // Mode 2 player
-                    else if (gameMode === '2player') {
-                        var currentTurn = game.turn();
-                        if ((currentTurn === 'w' && piece.search(/^w/) === -1) ||
-                            (currentTurn === 'b' && piece.search(/^b/) === -1)) {
-                            return false;
-                        }
-                        return true;
+                        if (!onlineConnected) { alert('Belum terhubung'); return false; }
+                        var turn = game.turn();
+                        if (isHost && turn === 'w') return true;
+                        if (!isHost && turn === 'b') return true;
+                        return false;
+                    } else if (gameMode === 'vsbot') {
+                        return game.turn() === 'w' && piece.search(/^w/) !== -1;
+                    } else if (gameMode === '2player') {
+                        var turn = game.turn();
+                        return (turn === 'w' && piece.search(/^w/) !== -1) || (turn === 'b' && piece.search(/^b/) !== -1);
                     }
                     return false;
                 },
                 onDrop: function(source, target) {
-                    var move = game.move({
-                        from: source,
-                        to: target,
-                        promotion: 'q'
-                    });
-
-                    if (move === null) {
-                        alert('⚠️ Langkah tidak sah!');
-                        return 'snapback';
-                    }
-
+                    var move = game.move({ from: source, to: target, promotion: 'q' });
+                    if (!move) { alert('Langkah tidak sah'); return 'snapback'; }
                     board.position(game.fen());
+                    playMoveSound();
                     updateTurnIndicators();
-
-                    // Jika online, kirim gerakan ke lawan
-                    if (gameMode === 'online' && conn && conn.open) {
-                        sendMove(move);
-                    }
-
-                    // Jika vs bot, jalankan bot
-                    if (gameMode === 'vsbot' && !game.game_over()) {
-                        setTimeout(makeBotMove, 200);
-                    }
-
+                    if (gameMode === 'online' && conn && conn.open) sendMove(move);
+                    if (gameMode === 'vsbot' && !game.game_over()) setTimeout(makeBotMove, 200);
                     return true;
                 },
-                onSnapEnd: function() {
-                    board.position(game.fen());
-                }
+                onSnapEnd: function() { board.position(game.fen()); }
             };
 
             board = Chessboard('board', boardConfig);
             updateTurnIndicators();
             updateScoreUI();
 
-            // Event listener mode
-            $('#mode2p').on('click', function() { setMode('2player'); });
-            $('#modeBot').on('click', function() { setMode('vsbot'); });
-            $('#modeOnline').on('click', function() { setMode('online'); });
+            $('#mode2p').click(() => setMode('2player'));
+            $('#modeBot').click(() => setMode('vsbot'));
+            $('#modeOnline').click(() => setMode('online'));
 
-            // Online: Host
-            $('#hostBtn').on('click', function() {
-                if (peer) peer.destroy();
-                peer = new Peer(); // Buat peer baru dengan ID acak
-                peer.on('open', function(id) {
-                    myId = id;
-                    isHost = true;
-                    onlineConnected = false; // masih menunggu koneksi
-                    $onlineStatus.text('Status: Menunggu lawan...');
-                    $myPeerId.text('ID Anda: ' + id);
-                });
-
-                peer.on('connection', function(connection) {
-                    conn = connection;
-                    conn.on('open', function() {
-                        onlineConnected = true;
-                        $onlineStatus.text('Status: Terhubung (Anda Putih)');
-                        game.reset(); // reset papan
-                        board.position(game.fen());
-                        updateTurnIndicators();
-                    });
-                    conn.on('data', function(data) {
-                        if (data.type === 'move') {
-                            applyRemoteMove(data);
-                        }
-                    });
-                    conn.on('close', function() {
-                        onlineConnected = false;
-                        $onlineStatus.text('Status: Koneksi terputus');
-                    });
-                });
-            });
-
-            // Online: Join
-            $('#joinBtn').on('click', function() {
-                var targetId = $('#peerIdInput').val().trim();
-                if (!targetId) {
-                    alert('Masukkan ID lawan');
-                    return;
-                }
+            $('#hostBtn').click(() => {
+                myName = $('#nameInput').val().trim();
+                if (!myName) myName = 'Host';
                 if (peer) peer.destroy();
                 peer = new Peer();
-                peer.on('open', function(id) {
-                    myId = id;
-                    isHost = false;
-                    $myPeerId.text('ID Anda: ' + id);
-                    // Sambungkan ke host
-                    conn = peer.connect(targetId);
-                    conn.on('open', function() {
+                peer.on('open', id => {
+                    myId = id; isHost = true; onlineConnected = false;
+                    $onlineStatus.text('Status: Menunggu lawan...');
+                    $myPeerId.text('ID: ' + id);
+                });
+                peer.on('connection', c => {
+                    conn = c;
+                    conn.on('open', () => {
                         onlineConnected = true;
-                        $onlineStatus.text('Status: Terhubung (Anda Hitam)');
-                        game.reset();
-                        board.position(game.fen());
-                        updateTurnIndicators();
+                        // Kirim nama kita ke lawan
+                        conn.send({ type: 'name', name: myName });
+                        $onlineStatus.text('Status: Terhubung (Putih)');
+                        game.reset(); board.position(game.fen()); updateTurnIndicators();
+                        // Update avatar kiri dengan nama kita
+                        $('#avatarLeft1 span:first-child').text(myName);
                     });
-                    conn.on('data', function(data) {
-                        if (data.type === 'move') {
-                            applyRemoteMove(data);
+                    conn.on('data', d => {
+                        if (d.type === 'move') applyRemoteMove(d);
+                        else if (d.type === 'name') {
+                            opponentName = d.name;
+                            $('#avatarRight1 span:first-child').text(opponentName);
                         }
                     });
-                    conn.on('close', function() {
-                        onlineConnected = false;
-                        $onlineStatus.text('Status: Koneksi terputus');
-                    });
+                    conn.on('close', () => { onlineConnected = false; $onlineStatus.text('Status: Putus'); });
                 });
             });
 
-            // New Game
-            $('#newGameBtn').on('click', function() {
-                game.reset();
-                board.position(game.fen());
-                updateTurnIndicators();
-                // Jika online dan terhubung, reset mungkin perlu disinkronisasi? 
-                // Untuk sederhana, kita biarkan masing-masing reset sendiri.
-                if (gameMode === 'online' && conn && conn.open) {
-                    // Opsional: kirim sinyal reset ke lawan, tetapi tidak diimplementasikan di sini.
-                }
+            $('#joinBtn').click(() => {
+                myName = $('#nameInput').val().trim();
+                if (!myName) myName = 'Player';
+                var targetId = $('#peerIdInput').val().trim();
+                if (!targetId) { alert('Masukkan ID lawan'); return; }
+                if (peer) peer.destroy();
+                peer = new Peer();
+                peer.on('open', id => {
+                    myId = id; isHost = false;
+                    $myPeerId.text('ID: ' + id);
+                    conn = peer.connect(targetId);
+                    conn.on('open', () => {
+                        onlineConnected = true;
+                        // Kirim nama kita ke lawan
+                        conn.send({ type: 'name', name: myName });
+                        $onlineStatus.text('Status: Terhubung (Hitam)');
+                        game.reset(); board.position(game.fen()); updateTurnIndicators();
+                        // Update avatar kanan dengan nama kita
+                        $('#avatarRight1 span:first-child').text(myName);
+                    });
+                    conn.on('data', d => {
+                        if (d.type === 'move') applyRemoteMove(d);
+                        else if (d.type === 'name') {
+                            opponentName = d.name;
+                            $('#avatarLeft1 span:first-child').text(opponentName);
+                        }
+                    });
+                    conn.on('close', () => { onlineConnected = false; $onlineStatus.text('Status: Putus'); });
+                });
             });
 
-            // Reset Skor
-            $('#resetScoreBtn').on('click', function() {
-                scoreWhite = 0;
-                scoreBlack = 0;
-                updateScoreUI();
-            });
+            $('#newGameBtn').click(() => { game.reset(); board.position(game.fen()); updateTurnIndicators(); });
+            $('#resetScoreBtn').click(() => { scoreWhite = 0; scoreBlack = 0; updateScoreUI(); });
 
-            // Gaya square
-            $('.square-55d63').css('box-shadow', 'inset 0 0 4px rgba(0,0,0,0.2)');
-
-            // Inisialisasi: mode online aktif, panel muncul
             setMode('online');
+
+            // Hamburger & Fix Lag
+            let lagFixActive = false;
+            $('#hamburgerBtn').click(e => { e.stopPropagation(); $('#hamburgerDropdown').toggleClass('show'); });
+            $(document).click(() => $('#hamburgerDropdown').removeClass('show'));
+            $('#hamburgerDropdown').click(e => e.stopPropagation());
+            $('#fixLagBtn').click(function() {
+                lagFixActive = !lagFixActive;
+                if (lagFixActive) { ParticleSystem.stop(); $(this).text('Fix Lag: On'); }
+                else { ParticleSystem.start(); $(this).text('Fix Lag: Off'); }
+                $('#hamburgerDropdown').removeClass('show');
+            });
         });
     </script>
 </body>
