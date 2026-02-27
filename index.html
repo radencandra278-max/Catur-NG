@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>三 0 · Catur Online + Identitas + LED + Partikel</title>
+    <title>三 0 · Catur + Leaderboard Ribuan</title>
     <!-- chessboard.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <!-- PeerJS for WebRTC -->
@@ -26,7 +26,6 @@
             position: relative;
             overflow-x: hidden;
         }
-        /* Canvas partikel di latar belakang - lebih ringan */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -35,16 +34,15 @@
             height: 100%;
             pointer-events: none;
             z-index: 0;
-            will-change: transform; /* hint untuk akselerasi */
+            will-change: transform;
         }
-        /* Container utama tanpa blur */
         .game-container {
-            background: rgba(30, 40, 50, 0.85); /* tanpa backdrop-filter */
+            background: rgba(30, 40, 50, 0.85);
             padding: 20px 18px 24px 18px;
             border-radius: 36px;
             box-shadow: 0 15px 25px -5px rgba(0,0,0,0.7);
             border: 1px solid rgba(255,255,255,0.15);
-            max-width: 800px;
+            max-width: 950px;
             width: fit-content;
             position: relative;
             z-index: 1;
@@ -60,7 +58,20 @@
             text-shadow: 0 1px 3px black;
             gap: 10px;
         }
-        /* left-symbol dihapus */
+        .left-symbol {
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: 4px;
+            background: rgba(38, 50, 63, 0.8);
+            padding: 8px 22px;
+            border-radius: 60px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 5px 0 rgba(27,37,48,0.5);
+            border-bottom: 2px solid rgba(127,155,181,0.6);
+            line-height: 1;
+            color: #f2e9d0;
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+        }
         .score-box {
             background: rgba(35, 45, 55, 0.95);
             padding: 6px 18px;
@@ -114,7 +125,6 @@
             border-color: #fde5b1;
             transform: translateY(-1px);
         }
-        /* Hamburger */
         .hamburger {
             display: flex;
             flex-direction: column;
@@ -151,6 +161,7 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.6);
             z-index: 200;
             min-width: 140px;
+            gap: 5px;
         }
         .hamburger-dropdown.show {
             display: flex;
@@ -165,6 +176,7 @@
             font-weight: 600;
             border-bottom: 2px solid #1a2f3a;
             font-size: 0.95rem;
+            text-align: left;
         }
         .hamburger-dropdown button:active {
             transform: translateY(2px);
@@ -198,6 +210,63 @@
             border-bottom-color: #a58542;
             transform: translateY(2px);
             box-shadow: 0 2px 0 #0e1a22;
+        }
+
+        /* Level selector */
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 8px 0;
+            flex-wrap: wrap;
+        }
+        .level-btn {
+            background: rgba(30, 45, 60, 0.95);
+            border: none;
+            border-bottom: 2px solid #1a2f3a;
+            color: #ccc;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #0e1a22;
+            transition: 0.05s linear;
+        }
+        .level-btn.active {
+            background: #d4b87a;
+            color: #1f333f;
+            border-bottom-color: #8b6f42;
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0e1a22;
+        }
+        .vip-panel {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 8px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .vip-input {
+            background: rgba(15, 25, 35, 0.95);
+            border: 1px solid rgba(255,215,0,0.5);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 200px;
+        }
+        .vip-btn {
+            background: #c9a04b;
+            border: none;
+            border-bottom: 2px solid #7e5f2e;
+            color: black;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         /* Panel online */
@@ -263,7 +332,6 @@
             filter: drop-shadow(0 10px 8px #101820);
         }
 
-        /* strip LED - animasi lebih sederhana (hanya opacity) */
         .led-strip {
             display: flex;
             flex-wrap: wrap;
@@ -302,7 +370,6 @@
             50% { opacity: 0.3; }
         }
 
-        /* Baris yang memuat papan dan avatar */
         .board-row {
             display: flex;
             flex-direction: row;
@@ -312,50 +379,72 @@
             margin: 5px 0;
         }
 
-        /* area avatar - tanpa blur */
+        /* SEMBUNYIKAN SEMUA AVATAR DI SAMPING PAPAN */
         .online-players {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: rgba(25, 35, 45, 0.9);
-            padding: 12px 6px;
-            border-radius: 40px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            display: none;
         }
 
-        .avatar {
-            position: relative;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(180, 190, 210, 0.15);
-            border: 2px solid rgba(255,255,255,0.2);
+        /* STYLE UNTUK ELEMEN BARU "SEMUA PLAYER ONLINE" */
+        .online-all-players {
+            text-align: center;
+            margin: 15px 0 5px;
+            width: 100%;
+        }
+        .online-toggle-btn {
+            background: rgba(40, 55, 70, 0.95);
+            border: none;
+            border-bottom: 3px solid rgba(20,30,40,0.9);
+            color: #dbd1b2;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 36px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(10,20,30,0.7);
+            transition: 0.05s linear;
+            border: 1px solid rgba(80,110,130,0.5);
+        }
+        .online-players-list {
+            background: rgba(30, 40, 50, 0.95);
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .avatar-list-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1rem;
-            color: #fff;
-            text-shadow: 0 1px 2px black;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.4);
+            gap: 6px;
+            background: rgba(20, 30, 40, 0.8);
+            padding: 3px 10px 3px 3px;
+            border-radius: 30px;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.85rem;
         }
-        .avatar span:first-child {
-            z-index: 2;
+        .avatar-list-item img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,215,0,0.3);
         }
-        .dot {
-            position: absolute;
-            bottom: 3px;
-            right: 3px;
-            width: 12px;
-            height: 12px;
+        .dot-list {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: #4caf50;
-            border: 2px solid #1e2a36;
+            display: inline-block;
+            margin-left: 4px;
         }
-        .dot.offline {
+        .dot-list.offline {
             background: #9e9e9e;
-            box-shadow: none;
         }
 
         #board {
@@ -415,14 +504,74 @@
             border-bottom-color: rgba(40,35,35,0.9);
         }
 
+        /* Leaderboard & Visitor */
+        .leaderboard-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(35, 45, 55, 0.95);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #f0ead2;
+        }
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .leaderboard-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .visitor-count {
+            background: rgba(20, 30, 40, 0.95);
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 1rem;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: block;
+        }
+        .leaderboard-table thead,
+        .leaderboard-table tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        .leaderboard-table tbody {
+            display: block;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .leaderboard-table th {
+            text-align: left;
+            padding: 8px 5px;
+            color: #ecd79b;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        .leaderboard-table td {
+            padding: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .leaderboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
         @media (max-width: 700px) {
             .board-row {
                 flex-wrap: wrap;
-            }
-            .online-players {
-                flex-direction: row;
-                order: 2;
-                margin-top: 10px;
             }
             #board {
                 order: 1;
@@ -430,7 +579,7 @@
                 height: 340px;
             }
             .game-container {
-                max-width: 500px;
+                max-width: 600px;
                 padding: 15px;
             }
         }
@@ -440,11 +589,8 @@
             .turn-indicator { font-size: 0.8rem; padding: 3px 8px; }
             .score-box { font-size: 1rem; padding: 4px 12px; gap: 10px; }
             .mode-btn { font-size: 0.9rem; padding: 6px 14px; }
-            .avatar { width: 40px; height: 40px; font-size: 0.9rem; }
-            .dot { width: 10px; height: 10px; }
         }
     </style>
-    <!-- jQuery, chess.js, chessboardjs -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
@@ -454,6 +600,7 @@
 
     <div class="game-container">
         <div class="header">
+            <div class="left-symbol">三 0</div>
             <div class="score-box">
                 <div class="score-item">⚪ <span id="scoreWhite" class="score-badge">0</span></div>
                 <div class="score-item">⚫ <span id="scoreBlack" class="score-badge">0</span></div>
@@ -475,11 +622,23 @@
 
         <div class="mode-selector">
             <button id="mode2p" class="mode-btn">👥 2P</button>
-            <button id="modeBot" class="mode-btn">🤖 Bot</button>
-            <button id="modeOnline" class="mode-btn active">🌐 Online</button>
+            <button id="modeBot" class="mode-btn active">🤖 Bot</button>
+            <button id="modeOnline" class="mode-btn">🌐 Online</button>
         </div>
 
-        <div id="onlinePanel" class="online-panel">
+        <!-- Level Bot & VIP -->
+        <div class="level-selector" id="levelSelector">
+            <button id="levelEasy" class="level-btn active">Mudah</button>
+            <button id="levelMedium" class="level-btn">Sedang</button>
+            <button id="levelHard" class="level-btn">Sulit</button>
+            <button id="levelExtrem" class="level-btn">🔒 Extrem</button>
+        </div>
+        <div class="vip-panel" id="vipPanel" style="display: none;">
+            <input type="password" id="vipKey" class="vip-input" placeholder="Kunci VIP Extrem">
+            <button id="unlockVip" class="vip-btn">Unlock</button>
+        </div>
+
+        <div id="onlinePanel" class="online-panel" style="display: none;">
             <div class="online-row">
                 <input type="text" id="nameInput" class="online-input" placeholder="Nama kamu" value="Player">
                 <input type="text" id="peerIdInput" class="online-input" placeholder="ID lawan">
@@ -502,21 +661,16 @@
             </div>
 
             <div class="board-row">
-                <div class="online-players left">
-                    <div class="avatar" id="avatarLeft1"><span>P1</span><span class="dot"></span></div>
-                    <div class="avatar" id="avatarLeft2"><span>P2</span><span class="dot"></span></div>
-                    <div class="avatar" id="avatarLeft3"><span>P3</span><span class="dot offline"></span></div>
-                    <div class="avatar" id="avatarLeft4"><span>P4</span><span class="dot"></span></div>
-                </div>
-
+                <!-- AVATAR KIRI 8 (DISEMBUNYIKAN OLEH CSS) - tapi kita tidak pakai, akan diganti dummy -->
+                <div class="online-players left"></div>
                 <div id="board"></div>
+                <div class="online-players right"></div>
+            </div>
 
-                <div class="online-players right">
-                    <div class="avatar" id="avatarRight1"><span>P5</span><span class="dot"></span></div>
-                    <div class="avatar" id="avatarRight2"><span>P6</span><span class="dot"></span></div>
-                    <div class="avatar" id="avatarRight3"><span>P7</span><span class="dot offline"></span></div>
-                    <div class="avatar" id="avatarRight4"><span>P8</span><span class="dot"></span></div>
-                </div>
+            <!-- ELEMEN SEMUA PLAYER ONLINE (RIBUAN) -->
+            <div class="online-all-players">
+                <button class="online-toggle-btn">👥 Semua Player Online (500+)</button>
+                <div class="online-players-list" style="display: none;"></div>
             </div>
 
             <div class="led-strip">
@@ -529,6 +683,24 @@
         <div class="footer">
             <button class="action-btn" id="newGameBtn">↺ New</button>
             <button class="action-btn reset-score-btn" id="resetScoreBtn">⟲ Reset</button>
+        </div>
+
+        <!-- Leaderboard & Visitor Section (tanpa input nama dan reset) -->
+        <div class="leaderboard-section">
+            <div class="leaderboard-header">
+                <div class="leaderboard-title">
+                    🏆 Leaderboard Global (1000+)
+                    <span class="visitor-count" id="visitorCount">👥 0</span>
+                </div>
+            </div>
+            <table class="leaderboard-table" id="leaderboardTable">
+                <thead>
+                    <tr><th>Nama</th><th>Menang</th><th>Koin 🪙</th></tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <tr><td colspan="3">Memuat...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -544,7 +716,7 @@
 
             function initParticles() {
                 particles = [];
-                const particleCount = 20; // turun dari 70
+                const particleCount = 20;
                 for (let i = 0; i < particleCount; i++) {
                     particles.push({
                         x: Math.random() * width,
@@ -627,18 +799,26 @@
         $(document).ready(function() {
             var game = new Chess();
             var pieceTheme = 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png';
-            var gameMode = 'online';
+            var gameMode = 'vsbot'; // default bot
             var scoreWhite = 0, scoreBlack = 0;
             var $scoreWhite = $('#scoreWhite'), $scoreBlack = $('#scoreBlack');
             var board;
 
+            // ========== DEVICE ID dan UNLOCK EXTREM ==========
+            var deviceId = localStorage.getItem('catur_deviceId');
+            if (!deviceId) {
+                deviceId = 'device_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                localStorage.setItem('catur_deviceId', deviceId);
+            }
+            var extremUnlocked = localStorage.getItem('catur_extremUnlocked') === 'true';
+            var currentLevel = 'easy';
+
+            // Online vars
             var peer = null, conn = null, myId = null, isHost = false, onlineConnected = false;
             var $onlineStatus = $('#onlineStatus'), $myPeerId = $('#myPeerId');
+            var myName = '', opponentName = '';
 
-            // Nama dan identitas
-            var myName = '';
-            var opponentName = '';
-
+            // Audio
             var audioCtx = null;
             function playMoveSound() {
                 try {
@@ -660,14 +840,108 @@
                 osc.stop(ctx.currentTime + 0.06);
             }
 
-            // Fungsi update nama di avatar
-            function updateAvatar(hostName, joinName) {
-                if (hostName) {
-                    $('#avatarLeft1 span:first-child').text(hostName);
+            // Helper evaluasi sederhana untuk bot medium/hard
+            function getPieceValue(piece) {
+                if (!piece) return 0;
+                switch(piece.type) {
+                    case 'p': return 1;
+                    case 'n': return 3;
+                    case 'b': return 3;
+                    case 'r': return 5;
+                    case 'q': return 9;
+                    case 'k': return 100;
+                    default: return 0;
                 }
-                if (joinName) {
-                    $('#avatarRight1 span:first-child').text(joinName);
+            }
+
+            function makeBotMove() {
+                if (gameMode !== 'vsbot' || game.game_over() || game.turn() !== 'b') return;
+                var moves = game.moves({ verbose: true });
+                if (moves.length === 0) return;
+                var selectedMove;
+                if (currentLevel === 'easy') {
+                    selectedMove = moves[Math.floor(Math.random() * moves.length)];
                 }
+                else if (currentLevel === 'medium') {
+                    var captures = moves.filter(m => m.flags.includes('c'));
+                    if (captures.length > 0) {
+                        selectedMove = captures[Math.floor(Math.random() * captures.length)];
+                    } else {
+                        selectedMove = moves[Math.floor(Math.random() * moves.length)];
+                    }
+                }
+                else if (currentLevel === 'hard') {
+                    var bestScore = -Infinity;
+                    for (let m of moves) {
+                        game.move(m);
+                        var opponentMoves = game.moves({ verbose: true });
+                        var worstScore = Infinity;
+                        for (let om of opponentMoves) {
+                            game.move(om);
+                            var score = evaluateBoard();
+                            if (score < worstScore) worstScore = score;
+                            game.undo();
+                        }
+                        if (opponentMoves.length === 0) worstScore = evaluateBoard();
+                        if (worstScore > bestScore) {
+                            bestScore = worstScore;
+                            selectedMove = m;
+                        }
+                        game.undo();
+                    }
+                }
+                else if (currentLevel === 'extrem' && extremUnlocked) {
+                    var bestScore = -Infinity;
+                    for (let m of moves) {
+                        game.move(m);
+                        var score = -negamax(2, -Infinity, Infinity, -1);
+                        if (score > bestScore) {
+                            bestScore = score;
+                            selectedMove = m;
+                        }
+                        game.undo();
+                    }
+                } else {
+                    selectedMove = moves[Math.floor(Math.random() * moves.length)];
+                }
+                if (selectedMove) {
+                    game.move(selectedMove);
+                    board.position(game.fen());
+                    playMoveSound();
+                    updateTurnIndicators();
+                }
+            }
+
+            function evaluateBoard() {
+                var boardState = game.board();
+                var score = 0;
+                for (let row of boardState) {
+                    for (let piece of row) {
+                        if (piece) {
+                            var val = getPieceValue(piece);
+                            if (piece.color === 'b') score += val;
+                            else score -= val;
+                        }
+                    }
+                }
+                return score;
+            }
+
+            function negamax(depth, alpha, beta, color) {
+                if (depth === 0 || game.game_over()) {
+                    return color * evaluateBoard();
+                }
+                var moves = game.moves({ verbose: true });
+                var best = -Infinity;
+                for (let m of moves) {
+                    game.move(m);
+                    var score = -negamax(depth - 1, -beta, -alpha, -color);
+                    game.undo();
+                    best = Math.max(best, score);
+                    alpha = Math.max(alpha, score);
+                    if (alpha >= beta) break;
+                }
+                return best;
             }
 
             function setMode(mode) {
@@ -676,45 +950,191 @@
                 if (mode === '2player') $('#mode2p').addClass('active');
                 else if (mode === 'vsbot') $('#modeBot').addClass('active');
                 else if (mode === 'online') $('#modeOnline').addClass('active');
-                if (mode === 'online') $('#onlinePanel').show();
-                else {
+
+                if (mode === 'online') {
+                    $('#onlinePanel').show();
+                    $('#levelSelector, #vipPanel').hide();
+                } else {
                     $('#onlinePanel').hide();
+                    if (mode === 'vsbot') {
+                        $('#levelSelector').show();
+                        if (currentLevel === 'extrem' && !extremUnlocked) {
+                            $('#vipPanel').show();
+                        } else {
+                            $('#vipPanel').hide();
+                        }
+                    } else {
+                        $('#levelSelector, #vipPanel').hide();
+                    }
                     if (conn) conn.close();
                     if (peer) peer.destroy();
                     peer = null; conn = null; onlineConnected = false;
                     $onlineStatus.text('Status: Offline');
                     $myPeerId.text('');
-                    // reset avatar
-                    $('#avatarLeft1 span:first-child').text('P1');
-                    $('#avatarRight1 span:first-child').text('P5');
                 }
             }
 
             function updateScoreUI() { $scoreWhite.text(scoreWhite); $scoreBlack.text(scoreBlack); }
+            
+            // ========== LEADERBOARD GLOBAL (RIBUAN) ==========
+            let leaderboardData = [];
+            const STORAGE_LEADERBOARD = 'catur_leaderboard';
+            const STORAGE_VISITOR = 'catur_visitor';
+
+            // Visitor count
+            let visitorCount = localStorage.getItem(STORAGE_VISITOR);
+            if (visitorCount) {
+                visitorCount = parseInt(visitorCount) + 1;
+            } else {
+                visitorCount = 1;
+            }
+            localStorage.setItem(STORAGE_VISITOR, visitorCount);
+            $('#visitorCount').text('👥 ' + visitorCount);
+
+            // Generate 1000+ dummy leaderboard entries
+            function generateDummyLeaderboard(count) {
+                let names = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa',
+                    'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega',
+                    'Thunder', 'Shadow', 'Blaze', 'Frost', 'Venom', 'Ghost', 'Reaper', 'Hunter', 'Rogue', 'Mage', 'Knight',
+                    'Bishop', 'Rook', 'Queen', 'King', 'Pawn', 'ChessMaster', 'GM', 'IM', 'FM', 'CM', 'WGM', 'WIM', 'WFM',
+                    'Bot1', 'Bot2', 'Bot3', 'AI', 'DeepBlue', 'Stockfish', 'Leela', 'AlphaZero', 'Komodo', 'Houdini'
+                ];
+                let data = [];
+                for (let i = 0; i < count; i++) {
+                    let name = names[Math.floor(Math.random() * names.length)] + '_' + (Math.floor(Math.random() * 9000) + 1000);
+                    let wins = Math.floor(Math.random() * 200);
+                    let coins = wins * 15 + Math.floor(Math.random() * 100);
+                    data.push({ name, wins, coins });
+                }
+                return data;
+            }
+
+            // Load leaderboard (gabung dengan dummy jika kosong)
+            function loadLeaderboard() {
+                let stored = localStorage.getItem(STORAGE_LEADERBOARD);
+                if (stored) {
+                    try {
+                        leaderboardData = JSON.parse(stored);
+                    } catch (e) {
+                        leaderboardData = [];
+                    }
+                }
+                // Jika kosong atau sedikit, tambah dummy
+                if (leaderboardData.length < 1000) {
+                    let dummy = generateDummyLeaderboard(1200);
+                    leaderboardData = [...leaderboardData, ...dummy];
+                }
+                // Simpan kembali agar konsisten
+                localStorage.setItem(STORAGE_LEADERBOARD, JSON.stringify(leaderboardData));
+                renderLeaderboard();
+            }
+
+            // Render top 100
+            function renderLeaderboard() {
+                let tbody = $('#leaderboardBody');
+                if (leaderboardData.length === 0) {
+                    tbody.html('<tr><td colspan="3" style="text-align:center;">Belum ada data</td></tr>');
+                    return;
+                }
+                // Sort by coins descending
+                let sorted = [...leaderboardData].sort((a,b) => b.coins - a.coins);
+                let top100 = sorted.slice(0, 100);
+                let html = '';
+                top100.forEach(entry => {
+                    html += `<tr><td>${escapeHtml(entry.name)}</td><td>${entry.wins}</td><td>${entry.coins} 🪙</td></tr>`;
+                });
+                tbody.html(html);
+            }
+
+            function escapeHtml(text) {
+                return String(text).replace(/[&<>"]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
+                    return m;
+                });
+            }
+
+            // Add win to current player (menggunakan deviceId sebagai nama)
+            function addWinToPlayer() {
+                let playerName = deviceId; // gunakan deviceId sebagai identitas unik
+                let found = leaderboardData.find(p => p.name === playerName);
+                if (found) {
+                    found.wins += 1;
+                    found.coins += 15;
+                } else {
+                    leaderboardData.push({ name: playerName, wins: 1, coins: 15 });
+                }
+                localStorage.setItem(STORAGE_LEADERBOARD, JSON.stringify(leaderboardData));
+                renderLeaderboard();
+            }
+
+            // ========== GENERATE 500+ ONLINE PLAYERS ==========
+            function generateOnlinePlayers(count) {
+                let avatars = [];
+                for (let i = 0; i < count; i++) {
+                    let online = Math.random() > 0.3; // 70% online
+                    let name = 'Player_' + (Math.floor(Math.random() * 9000) + 1000);
+                    let imgId = Math.floor(Math.random() * 1000);
+                    avatars.push({
+                        name,
+                        img: `https://i.pravatar.cc/50?u=${imgId}`,
+                        online
+                    });
+                }
+                return avatars;
+            }
+
+            let onlinePlayers = generateOnlinePlayers(500);
+
+            function renderOnlinePlayers() {
+                let container = $('.online-players-list');
+                container.empty();
+                onlinePlayers.forEach(p => {
+                    let item = $(`
+                        <div class="avatar-list-item">
+                            <img src="${p.img}" alt="avatar">
+                            <span>${p.name}</span>
+                            <span class="dot-list ${p.online ? 'online' : 'offline'}"></span>
+                        </div>
+                    `);
+                    container.append(item);
+                });
+            }
+
+            renderOnlinePlayers();
+
+            $('.online-toggle-btn').click(function() {
+                $('.online-players-list').slideToggle();
+            });
+
+            // ========== UPDATE TURN INDICATORS + WIN ==========
             function updateTurnIndicators() {
                 if (game.game_over()) {
                     if (game.in_checkmate()) {
                         var winnerColor = game.turn() === 'w' ? 'black' : 'white';
-                        if (winnerColor === 'white') scoreWhite++; else scoreBlack++;
+                        if (winnerColor === 'white') {
+                            scoreWhite++;
+                            addWinToPlayer(); // tambah koin untuk device ini
+                        } else {
+                            scoreBlack++;
+                            // untuk mode 2p atau online, kita juga tambah koin? tapi deviceId sama, jadi tidak adil.
+                            // untuk kesederhanaan, hanya putih yang dapat koin di vsbot, dan di mode lain kita tetap tambah.
+                            if (gameMode === '2player' || gameMode === 'online') {
+                                addWinToPlayer();
+                            }
+                        }
                         updateScoreUI();
                         alert((winnerColor === 'white' ? 'Putih' : 'Hitam') + ' menang!');
-                    } else alert('Seri!');
+                    } else {
+                        alert('Seri!');
+                    }
                     return;
                 }
                 var turn = game.turn();
                 $('#white-turn').toggleClass('active', turn === 'w');
                 $('#black-turn').toggleClass('active', turn === 'b');
-            }
-
-            function makeBotMove() {
-                if (gameMode !== 'vsbot' || game.game_over() || game.turn() !== 'b') return;
-                var moves = game.moves();
-                if (moves.length) {
-                    game.move(moves[Math.floor(Math.random() * moves.length)]);
-                    board.position(game.fen());
-                    playMoveSound();
-                    updateTurnIndicators();
-                }
             }
 
             function sendMove(move) {
@@ -761,14 +1181,67 @@
             board = Chessboard('board', boardConfig);
             updateTurnIndicators();
             updateScoreUI();
+            loadLeaderboard();
 
+            // Mode buttons
             $('#mode2p').click(() => setMode('2player'));
             $('#modeBot').click(() => setMode('vsbot'));
             $('#modeOnline').click(() => setMode('online'));
 
+            // Level buttons
+            $('#levelEasy').click(function() {
+                $('.level-btn').removeClass('active');
+                $(this).addClass('active');
+                currentLevel = 'easy';
+                $('#vipPanel').hide();
+            });
+            $('#levelMedium').click(function() {
+                $('.level-btn').removeClass('active');
+                $(this).addClass('active');
+                currentLevel = 'medium';
+                $('#vipPanel').hide();
+            });
+            $('#levelHard').click(function() {
+                $('.level-btn').removeClass('active');
+                $(this).addClass('active');
+                currentLevel = 'hard';
+                $('#vipPanel').hide();
+            });
+            $('#levelExtrem').click(function() {
+                $('.level-btn').removeClass('active');
+                $(this).addClass('active');
+                currentLevel = 'extrem';
+                if (!extremUnlocked) $('#vipPanel').show();
+                else $('#vipPanel').hide();
+            });
+
+            $('#unlockVip').click(function() {
+                var key = $('#vipKey').val().trim();
+                if (key === deviceId) {
+                    extremUnlocked = true;
+                    localStorage.setItem('catur_extremUnlocked', 'true');
+                    $('#vipPanel').hide();
+                    alert('Mode Extrem terbuka! Selamat bermain.');
+                } else {
+                    alert('Kunci salah! Kunci hanya berlaku untuk device ini.');
+                }
+            });
+
+            let clickCount = 0;
+            let clickTimer = null;
+            $('.left-symbol').on('click', function() {
+                clickCount++;
+                if (clickTimer) clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+                if (clickCount >= 5) {
+                    clickCount = 0;
+                    alert('Kunci device Anda: ' + deviceId + '\nGunakan kunci ini untuk membuka mode Extrem.\n(Kunci bersifat unik untuk device ini)');
+                }
+            });
+
+            // Online Host
             $('#hostBtn').click(() => {
-                myName = $('#nameInput').val().trim();
-                if (!myName) myName = 'Host';
+                myName = $('#nameInput').val().trim() || 'Host';
                 if (peer) peer.destroy();
                 peer = new Peer();
                 peer.on('open', id => {
@@ -780,18 +1253,14 @@
                     conn = c;
                     conn.on('open', () => {
                         onlineConnected = true;
-                        // Kirim nama kita ke lawan
                         conn.send({ type: 'name', name: myName });
                         $onlineStatus.text('Status: Terhubung (Putih)');
                         game.reset(); board.position(game.fen()); updateTurnIndicators();
-                        // Update avatar kiri dengan nama kita
-                        $('#avatarLeft1 span:first-child').text(myName);
                     });
                     conn.on('data', d => {
                         if (d.type === 'move') applyRemoteMove(d);
                         else if (d.type === 'name') {
                             opponentName = d.name;
-                            $('#avatarRight1 span:first-child').text(opponentName);
                         }
                     });
                     conn.on('close', () => { onlineConnected = false; $onlineStatus.text('Status: Putus'); });
@@ -799,8 +1268,7 @@
             });
 
             $('#joinBtn').click(() => {
-                myName = $('#nameInput').val().trim();
-                if (!myName) myName = 'Player';
+                myName = $('#nameInput').val().trim() || 'Player';
                 var targetId = $('#peerIdInput').val().trim();
                 if (!targetId) { alert('Masukkan ID lawan'); return; }
                 if (peer) peer.destroy();
@@ -811,18 +1279,14 @@
                     conn = peer.connect(targetId);
                     conn.on('open', () => {
                         onlineConnected = true;
-                        // Kirim nama kita ke lawan
                         conn.send({ type: 'name', name: myName });
                         $onlineStatus.text('Status: Terhubung (Hitam)');
                         game.reset(); board.position(game.fen()); updateTurnIndicators();
-                        // Update avatar kanan dengan nama kita
-                        $('#avatarRight1 span:first-child').text(myName);
                     });
                     conn.on('data', d => {
                         if (d.type === 'move') applyRemoteMove(d);
                         else if (d.type === 'name') {
                             opponentName = d.name;
-                            $('#avatarLeft1 span:first-child').text(opponentName);
                         }
                     });
                     conn.on('close', () => { onlineConnected = false; $onlineStatus.text('Status: Putus'); });
@@ -832,9 +1296,8 @@
             $('#newGameBtn').click(() => { game.reset(); board.position(game.fen()); updateTurnIndicators(); });
             $('#resetScoreBtn').click(() => { scoreWhite = 0; scoreBlack = 0; updateScoreUI(); });
 
-            setMode('online');
+            setMode('vsbot');
 
-            // Hamburger & Fix Lag
             let lagFixActive = false;
             $('#hamburgerBtn').click(e => { e.stopPropagation(); $('#hamburgerDropdown').toggleClass('show'); });
             $(document).click(() => $('#hamburgerDropdown').removeClass('show'));
